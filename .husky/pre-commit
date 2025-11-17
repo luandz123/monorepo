@@ -1,1 +1,1 @@
-npm test
+nx run-many -t lint
