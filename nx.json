@@ -38,7 +38,7 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": ["apps/hoadondientu-e2e/**/*"]
+      "exclude": ["apps/hoadondientu-e2e/**/*", "apps/bff-e2e/**/*"]
     }
   ]
 }
