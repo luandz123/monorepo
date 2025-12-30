@@ -1,0 +1,27 @@
+{
+  "name": "configuration",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/configuration/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/configuration",
+        "tsConfig": "libs/configuration/tsconfig.lib.json",
+        "packageJson": "libs/configuration/package.json",
+        "main": "libs/configuration/src/index.ts",
+        "assets": ["libs/configuration/*.md"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/configuration/jest.config.cts"
+      }
+    }
+  }
+}
