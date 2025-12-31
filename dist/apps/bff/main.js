@@ -117,20 +117,59 @@ module.exports = require("@nestjs/config");
 
 /***/ }),
 /* 9 */
-/***/ ((__unused_webpack_module, exports) => {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CONFIGURATION = void 0;
-class Configuration {
+const base_config_1 = __webpack_require__(10);
+const app_config_1 = __webpack_require__(11);
+class Configuration extends base_config_1.BaseConfiguration {
     constructor() {
-        this.NODE_ENV = process.env.NODE_ENV || 'development';
-        this.PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
-        this.GLOBAL_PREFIX = process.env.GLOBAL_PREFIX || 'api';
+        super(...arguments);
+        this.APP_CONFIG = new app_config_1.AppConfiguration();
     }
 }
 exports.CONFIGURATION = new Configuration();
 
+
+/***/ }),
+/* 10 */
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.BaseConfiguration = void 0;
+class BaseConfiguration {
+    constructor() {
+        this.NODE_ENV = process.env['NODE_ENV'] || 'development';
+        this.GLOBAL_PREFIX = process.env['GLOBAL_PREFIX'] || 'api';
+        this.IS_DEV = process.env['IS_DEV'] === 'false';
+    }
+}
+exports.BaseConfiguration = BaseConfiguration;
+
+
+/***/ }),
+/* 11 */
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AppConfiguration = void 0;
+class AppConfiguration {
+    constructor() {
+        this.PORT = process.env['PORT'] ? parseInt(process.env['PORT'], 10) : 3000;
+    }
+}
+exports.AppConfiguration = AppConfiguration;
+
+
+/***/ }),
+/* 12 */
+/***/ ((module) => {
+
+module.exports = require("@nestjs/swagger");
 
 /***/ })
 /******/ 	]);
@@ -173,11 +212,28 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const common_1 = __webpack_require__(1);
 const core_1 = __webpack_require__(2);
 const app_module_1 = __webpack_require__(3);
+const swagger_1 = __webpack_require__(12);
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     const globalPrefix = app_module_1.AppModule.CONFIGURATION.GLOBAL_PREFIX || 'api';
     app.setGlobalPrefix(globalPrefix);
-    const port = app_module_1.AppModule.CONFIGURATION.PORT || 3000;
+    const config = new swagger_1.DocumentBuilder()
+        .setTitle('E Bff API')
+        .setDescription('The bff API description')
+        .setVersion('1.0')
+        .addTag('bff')
+        .addBearerAuth({
+        description: 'JWT Authorization header using the Bearer scheme',
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        in: 'header',
+    })
+        .build();
+    const documentFactory = () => swagger_1.SwaggerModule.createDocument(app, config);
+    swagger_1.SwaggerModule.setup(`${globalPrefix}/docs`, app, documentFactory);
+    const port = app_module_1.AppModule.CONFIGURATION.APP_CONFIG.PORT || 3000;
     await app.listen(port);
     common_1.Logger.log(`🚀 Application is running on: http://localhost:${port}/${globalPrefix}`);
 }
